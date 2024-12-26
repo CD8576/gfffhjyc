@@ -2,13 +2,23 @@
     "name": "audio-recording",
     "description": "Record sound clips. micro:bit (V2) only",
     "dependencies": {
-        "core": "file:../core"
+        "core": "file:../core",
+        "microphone": "*",
+        "audio-recording": "*"
     },
-    "weight": 10,
     "files": [
         "recording.ts",
         "recording.cpp",
         "shims.d.ts"
     ],
-    "public": true
+    "public": true,
+    "targetVersions": {
+        "target": "7.0.51",
+        "targetId": "microbit"
+    },
+    "supportedTargets": [
+        "microbit"
+    ],
+    "preferredEditor": "tsprj",
+    "weight": 10
 }
