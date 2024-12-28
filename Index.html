@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Frequency Extractor</title>
+  <title>WAV Frequency Extractor</title>
 </head>
 <body>
-  <h1>Audio Frequency Extractor</h1>
-  <input type="file" id="audioFile" accept="audio/*">
+  <h1>WAV Frequency Extractor</h1>
+  <p>Upload a WAV file to extract frequencies:</p>
+  <input type="file" id="audioFile" accept=".wav">
   <button id="extractFrequencies">Extract Frequencies</button>
   <pre id="output"></pre>
 
@@ -17,7 +18,7 @@
     document.getElementById('extractFrequencies').addEventListener('click', async () => {
       const fileInput = document.getElementById('audioFile');
       if (!fileInput.files.length) {
-        alert('Please upload an audio file.');
+        alert('Please upload a WAV file.');
         return;
       }
 
@@ -46,7 +47,7 @@
         analyser.getByteFrequencyData(dataArray);
         const maxFrequencyIndex = dataArray.indexOf(Math.max(...dataArray));
         const frequency = (maxFrequencyIndex * audioContext.sampleRate) / analyser.fftSize;
-        if (frequency > 20) frequencies.push(frequency.toFixed(2));
+        if (frequency > 20) frequencies.push(frequency.toFixed(2)); // Ignore very low frequencies
         if (!source.playbackState || source.playbackState === source.FINISHED_STATE) {
           clearInterval(interval);
         }
