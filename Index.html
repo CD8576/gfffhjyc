@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frequency Extractor</title>
+</head>
+<body>
+  <h1>Audio Frequency Extractor</h1>
+  <input type="file" id="audioFile" accept="audio/*">
+  <button id="extractFrequencies">Extract Frequencies</button>
+  <pre id="output"></pre>
+
+  <script>
+    const frequencies = [];
+
+    document.getElementById('extractFrequencies').addEventListener('click', async () => {
+      const fileInput = document.getElementById('audioFile');
+      if (!fileInput.files.length) {
+        alert('Please upload an audio file.');
+        return;
+      }
+
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const file = fileInput.files[0];
+      const arrayBuffer = await file.arrayBuffer();
+      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+      // Create an AnalyserNode to extract frequency data
+      const analyser = audioContext.createAnalyser();
+      const source = audioContext.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+
+      // Start the audio and process frequency data
+      source.start();
+      analyser.fftSize = 2048;
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      source.onended = () => {
+        document.getElementById('output').textContent = `Frequencies: ${frequencies.join(', ')}`;
+      };
+
+      function getFrequencies() {
+        analyser.getByteFrequencyData(dataArray);
+        const maxFrequencyIndex = dataArray.indexOf(Math.max(...dataArray));
+        const frequency = (maxFrequencyIndex * audioContext.sampleRate) / analyser.fftSize;
+        if (frequency > 20) frequencies.push(frequency.toFixed(2));
+        if (!source.playbackState || source.playbackState === source.FINISHED_STATE) {
+          clearInterval(interval);
+        }
+      }
+
+      const interval = setInterval(getFrequencies, 100); // Capture frequencies every 100ms
+    });
+  </script>
+</body>
+</html>
